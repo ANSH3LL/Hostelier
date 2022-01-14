@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }} />
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script src={{ url_for('static', filename='js/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='js/jquery.modal.min.js') }}></script>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/jquery.modal.min.css') }} />
+    <title>Hostelier Hostels | Maintenance tickets</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="ex0" class="modal">
+                    <p style="margin: 3px auto 7px auto;">{{ message }}</p>
+                </div>
+                <script type="text/javascript">$('#ex0').modal();</script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <nav>
+        <header class="nav-header">
+            <img style="height: 6rem; width: auto; margin: auto;" src={{ url_for('static', filename='img/logo.png') }} alt="Hostelier Hostels" />
+        </header>
+        <ul class="options">
+            <li onclick="window.location.href='/dashboard'"><i class="ph-gauge"></i> Dashboard</li>
+            <li onclick="window.location.href='/profile'"><i class="ph-user"></i> Profile</li>
+            <li onclick="window.location.href='/announcements'"><i class="ph-info"></i> Announcements</li>
+            {% if session['access'] == 'student' %}
+            <li onclick="window.location.href='/payments'"><i class="ph-money"></i> Rent &amp; Utility payments</li>
+            {% endif %}
+            <li class="current"><i class="ph-wrench"></i> Maintenance tickets</li>
+            {% if session['access'] == 'staff' %}
+            <li onclick="window.location.href='/rooms'"><i class="ph-bed"></i> Rooms </li>
+            <li onclick="window.location.href='/bookings'"><i class="ph-ticket"></i> Waiting list </li>
+            {% endif %}
+            <li onclick="window.location.href='/feedback'"><i class="ph-megaphone-simple"></i> Feedback </li>
+            {% if session['access'] == 'staff' and session['admin'] == True or session['canview_reports'] == True %}
+            <li onclick="window.location.href='/reports'"><i class="ph-presentation-chart"></i> Reports </li>
+            {% endif %}
+            {% if session['access'] == 'staff' and session['admin'] == True %}
+            <li onclick="window.location.href='/admin'"><i class="ph-shield-chevron"></i> Admin</li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div id="ex3" class="modal">
+        <span><b>Change password</b></span><br><br>
+        <form action="/changepassword" method="POST">
+            <input class="textbox" name="current" type="password" placeholder="Current password" required /><br>
+            <input class="textbox" name="new" type="password" placeholder="New password" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Change password</button>
+        </form>
+    </div>
+    <div id="ex4" class="modal">
+        <span><b>Close ticket</b></span><br>
+        <form action="/closeticket" method="POST">
+            <input id="ticketid" name="tid" type="text" hidden /><br>
+            <textarea class="textbox fillbox" name="remarks" placeholder="Remarks" required></textarea>
+            <button type="submit" class="regular-btn" style="width: max-content;">Close ticket</button>
+        </form>
+    </div>
+    <main>
+        <div class = "header">
+            <div class="usermenu">
+                <span>{{ session['name'] }}</span>
+                <div class="dropdown">
+                    <div class="dropbtn"><i class="ph-user-circle"></i></div>
+                    <div class="dropdown-content">
+                        <a href="#ex3" rel="modal:open"><i class="ph-identification-badge"></i> Change Password</a>
+                        <a href="/signout"><i class="ph-sign-out"></i> Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 style="margin: 15px 0 0 24px;">Maintenance tickets</h3>
+        </div>
+        {% if not data %}
+        <center style="margin-top: 200px;">
+            <img src={{ url_for('static', filename='img/empty.png') }} alt="Empty" />
+            <br><br>
+            <span>Hmmm, there aren't any tickets at the moment, make sure to check back later<span>
+        </center>
+        {% endif %}
+        {% for entry in data %}
+        {% if entry[7] == 'open' %}
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <span style="margin: 10px 0 0 20px;"><b style="color: #832380;">{{ entry[4] }}</b>&nbsp;&nbsp;—&nbsp;&nbsp;<b style="color: #c60063">{{ entry[3] }}</b>&nbsp;&nbsp;—&nbsp;&nbsp;<b>Room ID: <span style="font-size: 20px; font-weight: normal;">{{ entry[2] }}</span></b>&nbsp;&nbsp;—&nbsp;&nbsp;<b style="color: red;">Open</b><button onclick="$('#ticketid').val({{ entry[0] }}); $('#ex4').modal();" class="regular-btn" style="float: right; width: max-content; margin: 0 20px -10px 0;">Mark closed</button></span>
+            <span style="margin: 10px 0 0 20px;"><b>Opened on:</b> {{ entry[5] }}</span>
+            <div class="details4" style="height: max-content;">
+                <span>{% autoescape false %}{{ entry[1] }}{% endautoescape %}</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <span style="margin: 10px 0 0 20px;"><b style="color: #832380;">{{ entry[4] }}</b>&nbsp;&nbsp;—&nbsp;&nbsp;<b style="color: #c60063">{{ entry[3] }}</b>&nbsp;&nbsp;—&nbsp;&nbsp;<b>Room ID: <span style="font-size: 20px; font-weight: normal;">{{ entry[2] }}</span></b>&nbsp;&nbsp;—&nbsp;&nbsp;<b style="color: green;">Closed</b></span>
+            <span style="margin: 10px 0 0 20px;"><b>Opened on:</b> {{ entry[5] }}&nbsp;&nbsp;—&nbsp;&nbsp;<b>Closed on:</b> {{ entry[6] }}</span>
+            <span style="margin: 10px 0 0 20px;"><b>Remarks:</b> {{ entry[8] }}</span>
+            <div class="details4" style="height: max-content;">
+                <span>{% autoescape false %}{{ entry[1] }}{% endautoescape %}</span>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </main>
+</body>
+</html>

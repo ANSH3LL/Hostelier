@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+    <div>
+        <h3 style="margin: 15px 0 0 24px;">Hostelier Hostels - Staff members</h3>
+    </div>
+    <div class="details6" style="margin: 15px 20px 15px 20px;">
+        <table border=1 style="border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 5px;">Staff ID</th>
+                    <th style="padding: 5px;">Name</th>
+                    <th style="padding: 5px;">Gender</th>
+                    <th style="padding: 5px;">Date of birth</th>
+                    <th style="padding: 5px;">ID Number</th>
+                    <th style="padding: 5px;">Telephone</th>
+                    <th style="padding: 5px;">Email address</th>
+                    <th style="padding: 5px;">Is Admin</th>
+                    <th style="padding: 5px;">Can view reports</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in data %}
+                <tr>
+                    <td style="padding: 5px;">{{ entry[0] }}</td>
+                    <td style="padding: 5px;">{{ entry[1] + ' ' + entry[2] }}</td>
+                    {% if entry[3] == 'M' %}
+                    <td style="padding: 5px;">Male</td>
+                    {% else %}
+                    <td style="padding: 5px;">Female</td>
+                    {% endif %}
+                    <td style="padding: 5px;">{{ entry[4] }}</td>
+                    <td style="padding: 5px;">{{ entry[5] }}</td>
+                    <td style="padding: 5px;">{{ entry[6] }}</td>
+                    <td style="padding: 5px;">{{ entry[7] }}</td>
+                    {% if entry[8] == 'Y' %}
+                    <td style="padding: 5px;">Yes</td>
+                    {% else %}
+                    <td style="padding: 5px;">No</td>
+                    {% endif %}
+                    {% if entry[9] == 'Y' %}
+                    <td style="padding: 5px;">Yes</td>
+                    {% else %}
+                    <td style="padding: 5px;">No</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

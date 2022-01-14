@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }} />
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script src={{ url_for('static', filename='js/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='js/jquery.modal.min.js') }}></script>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/jquery.modal.min.css') }} />
+    <title>Hostelier Hostels | Admin</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="ex0" class="modal">
+                    <p style="margin: 3px auto 7px auto;">{{ message }}</p>
+                </div>
+                <script type="text/javascript">$('#ex0').modal();</script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <nav>
+        <header class="nav-header">
+            <img style="height: 6rem; width: auto; margin: auto;" src={{ url_for('static', filename='img/logo.png') }} alt="Hostelier Hostels" />
+        </header>
+        <ul class="options">
+            <li onclick="window.location.href='/dashboard'"><i class="ph-gauge"></i> Dashboard</li>
+            <li onclick="window.location.href='/profile'"><i class="ph-user"></i> Profile</li>
+            <li onclick="window.location.href='/announcements'"><i class="ph-info"></i> Announcements</li>
+            {% if session['access'] == 'student' %}
+            <li onclick="window.location.href='/payments'"><i class="ph-money"></i> Rent &amp; Utility payments</li>
+            {% endif %}
+            <li onclick="window.location.href='/tickets'"><i class="ph-wrench"></i> Maintenance tickets</li>
+            {% if session['access'] == 'staff' %}
+            <li onclick="window.location.href='/rooms'"><i class="ph-bed"></i> Rooms </li>
+            <li onclick="window.location.href='/bookings'"><i class="ph-ticket"></i> Waiting list </li>
+            {% endif %}
+            <li onclick="window.location.href='/feedback'"><i class="ph-megaphone-simple"></i> Feedback </li>
+            {% if session['access'] == 'staff' and session['admin'] == True or session['canview_reports'] == True %}
+            <li onclick="window.location.href='/reports'"><i class="ph-presentation-chart"></i> Reports </li>
+            {% endif %}
+            {% if session['access'] == 'staff' and session['admin'] == True %}
+            <li class="current"><i class="ph-shield-chevron"></i> Admin</li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div id="ex3" class="modal">
+        <span><b>Change password</b></span><br><br>
+        <form action="/changepassword" method="POST">
+            <input class="textbox" name="current" type="password" placeholder="Current password" required /><br>
+            <input class="textbox" name="new" type="password" placeholder="New password" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Change password</button>
+        </form>
+    </div>
+    <main>
+        <div class = "header">
+            <div class="usermenu">
+                <span>{{ session['name'] }}</span>
+                <div class="dropdown">
+                    <div class="dropbtn"><i class="ph-user-circle"></i></div>
+                    <div class="dropdown-content">
+                        <a href="#ex3" rel="modal:open"><i class="ph-identification-badge"></i> Change Password</a>
+                        <a href="/signout"><i class="ph-sign-out"></i> Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 style="margin: 15px 0 0 24px;">Administrative tasks</h3>
+        </div>
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <h3 style="margin: 15px 0 0 20px;">New staff member</h3>
+            <div class="details5" style="height: max-content;">
+                <form action="/newstaff" method="POST">
+                    <input type="text" class="textbox" name="fname" placeholder="First name" style="width: -moz-available;" required />
+                    <input type="text" class="textbox" name="lname" placeholder="Last name" style="width: -moz-available;" required />
+                    <div class="combobox">
+                        <span>Gender</span><br>
+                        <select name="gender" style="width: -moz-available;" required>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+                    <span>Date of birth</span><br>
+                    <input type="date" class="textbox" name="dob" style="width: -moz-available;" required />
+                    <input type="number" class="textbox" name="idno" placeholder="ID number" style="width: -moz-available;" required />
+                    <input class="textbox" name="telephone" type="tel" placeholder="Phone number" pattern="[\+](254)[17][0-9]{8}" title="+254 [7|1] xx xxx xxx" style="width: -moz-available;" required />
+                    <input type="email" class="textbox embox" name="email" placeholder="Email address" required />
+                    <div class="combobox">
+                        <span>Make admin</span><br>
+                        <select name="isadmin" style="width: -moz-available;" required>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+                    <div class="combobox">
+                        <span>Can view reports</span><br>
+                        <select name="canviewreports" style="width: -moz-available;" required>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+                    <input type="password" class="textbox" name="passwd" placeholder="Password" style="width: -moz-available;" required />
+                    <button type="submit" class="regular-btn" style="float: right;">Create staff account</button>
+                </form>
+            </div>
+        </div>
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <h3 style="margin: 15px 0 0 20px;">Staff members</h3>
+            <div class="details5" style="height: max-content;">
+                <table class="pretty-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>ID number</th>
+                            <th>Telephone</th>
+                            <th>Email address</th>
+                            <th>Admin</th>
+                            <th>Can view reports</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in data['staff'] %}
+                        <tr>
+                            <td>{{ entry[0] }}</td>
+                            <td>{{ entry[1] + ' ' + entry[2] }}</td>
+                            <td>{{ entry[3] }}</td>
+                            <td>{{ entry[4] }}</td>
+                            <td>{{ entry[5] }}</td>
+                            <td>{{ entry[6] }}</td>
+                            {% if entry[7] == 'Y' %}
+                            <td><b style="color: green;">Yes</td>
+                            {% else %}
+                            <td><b style="color: red;">No</td>
+                            {% endif %}
+                            {% if entry[8] == 'Y' %}
+                            <td><b style="color: green;">Yes</td>
+                            {% else %}
+                            <td><b style="color: red;">No</td>
+                            {% endif %}
+                            {% if entry[7] == 'Y' %}
+                            <td><b style="color: red;">Cannot delete admin</b></td>
+                            {% else %}
+                            <td><button onclick="window.location.href='/delstaff?id={{ entry[0] }}'" class="regular-btn" style="width: max-content;">Delete</button></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <h3 style="margin: 15px 0 0 20px;">Student residents</h3>
+            <div class="details5" style="height: max-content;">
+                <table class="pretty-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>ID number</th>
+                            <th>Telephone</th>
+                            <th>Email address</th>
+                            <th>University</th>
+                            <th>Room ID</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in data['students'] %}
+                        <tr>
+                            <td>{{ entry[0] }}</td>
+                            <td>{{ entry[1] + ' ' + entry[2] }}</td>
+                            <td>{{ entry[3] }}</td>
+                            <td>{{ entry[4] }}</td>
+                            <td>{{ entry[5] }}</td>
+                            <td>{{ entry[6] }}</td>
+                            <td>{{ entry[7] }}</td>
+                            <td>{{ entry[8] }}</td>
+                            <td><button onclick="window.location.href='/delstudent?id={{ entry[0] }}'" class="regular-btn" style="width: max-content;">Delete</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+    <div>
+        <h3 style="margin: 15px 0 0 24px;">Hostelier Hostels - Empty rooms</h3>
+    </div>
+    <div class="details6" style="margin: 15px 20px 15px 20px;">
+        <table border=1 style="border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 5px;">Room ID</th>
+                    <th style="padding: 5px;">Room type</th>
+                    <th style="padding: 5px;">Floor</th>
+                    <th style="padding: 5px;">Occupants / Maximum</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in data %}
+                <tr>
+                    <td style="padding: 5px;">{{ entry[0] }}</td>
+                    <td style="padding: 5px;">{{ entry[1] }}</td>
+                    <td style="padding: 5px;">{{ entry[2] }}</td>
+                    <td style="padding: 5px;">{{ entry[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

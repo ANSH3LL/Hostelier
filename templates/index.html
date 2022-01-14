@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/tailwind.min.css') }} />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }} />
+    <script src={{ url_for('static', filename='js/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='js/jquery.modal.min.js') }}></script>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/jquery.modal.min.css') }} />
+    <title>Hostelier Hostels</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="ex0" class="modal">
+                    <p style="margin: 3px auto 7px auto;">{{ message }}</p>
+                </div>
+                <script type="text/javascript">$('#ex0').modal();</script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div id="ex6" class="modal">
+        <span><b>Forgot password</b></span><br><br>
+        <form action="/forgotpassword" method="POST">
+            <input class="textbox" name="email" type="email" placeholder="Email address" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Request password reset</button>
+        </form>
+    </div>
+    <div class="page">
+        <div class="content">
+            <div>
+                <img style="height: 4rem; width: auto; margin: auto;" src={{ url_for('static', filename='img/logo.png') }} alt="Hostelier" />
+                <h2>Hostelier portal | Sign in</h2>
+                <p>Or <a href="/booking">book a room</a></p>
+            </div>
+            <form class="login-form" action="/signin" method="POST">
+                <div class="form-content-1">
+                    <div>
+                        <input class="input-1" name="email" type="email" placeholder="Email address" required />
+                        <input class="input-2" name="password" type="password" placeholder="Password" required />
+                    </div>
+                </div>
+                <div class="form-content-2">
+                    <div class="link-div">
+                        <label class="checkbox">
+                            Sign in as staff
+                            <input type="checkbox" name="staff" />
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    <div class="link-div">
+                        <a href="#ex6" rel="modal:open">Forgot your password?</a>
+                    </div>
+                </div>
+                <div style="margin-top: 1.4rem;">
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

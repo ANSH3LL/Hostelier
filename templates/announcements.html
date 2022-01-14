@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }} />
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script src={{ url_for('static', filename='js/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='js/jquery.modal.min.js') }}></script>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/jquery.modal.min.css') }} />
+    <title>Hostelier Hostels | Announcements</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="ex0" class="modal">
+                    <p style="margin: 3px auto 7px auto;">{{ message }}</p>
+                </div>
+                <script type="text/javascript">$('#ex0').modal();</script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <nav>
+        <header class="nav-header">
+            <img style="height: 6rem; width: auto; margin: auto;" src={{ url_for('static', filename='img/logo.png') }} alt="Hostelier Hostels" />
+        </header>
+        <ul class="options">
+            <li onclick="window.location.href='/dashboard'"><i class="ph-gauge"></i> Dashboard</li>
+            <li onclick="window.location.href='/profile'"><i class="ph-user"></i> Profile</li>
+            <li class="current"><i class="ph-info"></i> Announcements</li>
+            {% if session['access'] == 'student' %}
+            <li onclick="window.location.href='/payments'"><i class="ph-money"></i> Rent &amp; Utility payments</li>
+            {% endif %}
+            <li onclick="window.location.href='/tickets'"><i class="ph-wrench"></i> Maintenance tickets</li>
+            {% if session['access'] == 'staff' %}
+            <li onclick="window.location.href='/rooms'"><i class="ph-bed"></i> Rooms </li>
+            <li onclick="window.location.href='/bookings'"><i class="ph-ticket"></i> Waiting list </li>
+            {% endif %}
+            <li onclick="window.location.href='/feedback'"><i class="ph-megaphone-simple"></i> Feedback </li>
+            {% if session['access'] == 'staff' and session['admin'] == True or session['canview_reports'] == True %}
+            <li onclick="window.location.href='/reports'"><i class="ph-presentation-chart"></i> Reports </li>
+            {% endif %}
+            {% if session['access'] == 'staff' and session['admin'] == True %}
+            <li onclick="window.location.href='/admin'"><i class="ph-shield-chevron"></i> Admin</li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div id="ex3" class="modal">
+        <span><b>Change password</b></span><br><br>
+        <form action="/changepassword" method="POST">
+            <input class="textbox" name="current" type="password" placeholder="Current password" required /><br>
+            <input class="textbox" name="new" type="password" placeholder="New password" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Change password</button>
+        </form>
+    </div>
+    <main>
+        <div class = "header">
+            <div class="usermenu">
+                <span>{{ session['name'] }}</span>
+                <div class="dropdown">
+                    <div class="dropbtn"><i class="ph-user-circle"></i></div>
+                    <div class="dropdown-content">
+                        <a href="#ex3" rel="modal:open"><i class="ph-identification-badge"></i> Change Password</a>
+                        <a href="/signout"><i class="ph-sign-out"></i> Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 style="margin: 15px 0 0 24px;">Announcements</h3>
+        </div>
+        {% if not data %}
+        <center style="margin-top: 200px;">
+            <img src={{ url_for('static', filename='img/empty.png') }} alt="Empty" />
+            <br><br>
+            <span>Hmmm, there aren't any announcements at the moment, make sure to check back later<span>
+        </center>
+        {% endif %}
+        {% for entry in data %}
+        <div class="quick-actions" style="flex-direction: column; margin-bottom: 40px; height: max-content;">
+            <h3 style="margin: 15px 0 7px 20px;">{{ entry[1] }}</h3>
+            <span style="margin-left: 20px;"><b style="color: #832380;">{{ entry[3] }}</b>&nbsp;&nbsp;—&nbsp;&nbsp;{{ entry[4] }}</span>
+            <div class="details4" style="height: max-content;">
+                <span>{% autoescape false %}{{ entry[2] }}{% endautoescape %}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href={{ url_for('static', filename='css/style.css') }} />
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <script src={{ url_for('static', filename='js/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='js/jquery.modal.min.js') }}></script>
+    <link rel="stylesheet" href={{ url_for('static', filename='css/jquery.modal.min.css') }} />
+    <title>Hostelier Hostels | Waiting list</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="ex0" class="modal">
+                    <p style="margin: 3px auto 7px auto;">{{ message }}</p>
+                </div>
+                <script type="text/javascript">$('#ex0').modal();</script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <nav>
+        <header class="nav-header">
+            <img style="height: 6rem; width: auto; margin: auto;" src={{ url_for('static', filename='img/logo.png') }} alt="Hostelier Hostels" />
+        </header>
+        <ul class="options">
+            <li onclick="window.location.href='/dashboard'"><i class="ph-gauge"></i> Dashboard</li>
+            <li onclick="window.location.href='/profile'"><i class="ph-user"></i> Profile</li>
+            <li onclick="window.location.href='/announcements'"><i class="ph-info"></i> Announcements</li>
+            {% if session['access'] == 'student' %}
+            <li onclick="window.location.href='/payments'"><i class="ph-money"></i> Rent &amp; Utility payments</li>
+            {% endif %}
+            <li onclick="window.location.href='/tickets'"><i class="ph-wrench"></i> Maintenance tickets</li>
+            {% if session['access'] == 'staff' %}
+            <li onclick="window.location.href='/rooms'"><i class="ph-bed"></i> Rooms </li>
+            <li class="current"><i class="ph-ticket"></i> Waiting list </li>
+            {% endif %}
+            <li onclick="window.location.href='/feedback'"><i class="ph-megaphone-simple"></i> Feedback </li>
+            {% if session['access'] == 'staff' and session['admin'] == True or session['canview_reports'] == True %}
+            <li onclick="window.location.href='/reports'"><i class="ph-presentation-chart"></i> Reports </li>
+            {% endif %}
+            {% if session['access'] == 'staff' and session['admin'] == True %}
+            <li onclick="window.location.href='/admin'"><i class="ph-shield-chevron"></i> Admin</li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div id="ex3" class="modal">
+        <span><b>Change password</b></span><br><br>
+        <form action="/changepassword" method="POST">
+            <input class="textbox" name="current" type="password" placeholder="Current password" required /><br>
+            <input class="textbox" name="new" type="password" placeholder="New password" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Change password</button>
+        </form>
+    </div>
+    <div id="ex5" class="modal">
+        <span><b>Upgrade to resident and assign room</b></span>
+        <form action="/upgradebooking" method="POST">
+            <input id="bookingid" name="bid" type="text" hidden /><br>
+            <input id="studentid" name="sid" type="text" hidden /><br>
+            <div class="combobox">
+                <span>Room ID</span><br>
+                <select id="roomids" name="roomid" style="width: -moz-available;" required>
+                </select>
+            </div>
+            <span>Date of birth</span><br>
+            <input type="date" class="textbox" name="dob" style="width: -moz-available;" required />
+            <input type="number" class="textbox" name="idno" placeholder="ID number" style="width: -moz-available;" required />
+            <input class="textbox" name="passwd" type="password" placeholder="Password" style="width: -moz-available;" required /><br>
+            <button type="submit" class="regular-btn" style="width: max-content;">Upgrade to resident</button>
+        </form>
+    </div>
+    <main>
+        <div class = "header">
+            <div class="usermenu">
+                <span>{{ session['name'] }}</span>
+                <div class="dropdown">
+                    <div class="dropbtn"><i class="ph-user-circle"></i></div>
+                    <div class="dropdown-content">
+                        <a href="#ex3" rel="modal:open"><i class="ph-identification-badge"></i> Change Password</a>
+                        <a href="/signout"><i class="ph-sign-out"></i> Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 style="margin: 15px 0 0 24px;">Waiting list</h3>
+        </div>
+        {% if not data['bookings'] %}
+        <center style="margin-top: 200px;">
+            <img src={{ url_for('static', filename='img/empty.png') }} alt="Empty" />
+            <br><br>
+            <span>Hmmm, there's no one on the waiting list at the moment, make sure to check back later<span>
+        </center>
+        {% endif %}
+        {% if data['bookings'] %}
+        <div class="quick-actions" style="flex-direction: column; height: max-content;">
+            <div class="details6" style="margin: 15px 20px 15px 20px;">
+                <table class="pretty-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email address</th>
+                            <th>Telephone</th>
+                            <th>University</th>
+                            <th>Date</th>
+                            <th>Room type</th>
+                            <th>Paid deposit</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in data['bookings'] %}
+                        <tr>
+                            <td>{{ entry[0] }}</td>
+                            <td>{{ entry[1] + ' ' + entry[2] }}</td>
+                            <td>{{ entry[4] }}</td>
+                            <td>{{ entry[5] }}</td>
+                            <td>{{ entry[6] }}</td>
+                            <td>{{ entry[7] }}</td>
+                            <td>{{ entry[8] }}</td>
+                            {% if entry[9] == 'yes' %}
+                            <td><b style="color: green;">Yes</b></td>
+                            <td><button onclick="$('#bookingid').val({{ entry[0] }}); $('#studentid').val({{ entry[10] }}); setrooms('{{ entry[3] }}', '{{ data['full'] }}', '{{ entry[8] }}'); $('#ex5').modal();" class="regular-btn" style="width: max-content;">Assign room</button></td>
+                            {% else %}
+                            <td><b style="color: red;">No</b></td>
+                            <td><b style="color: red;">Deposit pending</b></td>
+                            {% endif %}
+                            <td><button onclick="window.location.href='/delbooking?id={{ entry[0] }}'" class="regular-btn" style="width: max-content;">Delete</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+    <script type="text/javascript">
+        function removeAll() {
+            let selectBox = document.getElementById('roomids');
+            while (selectBox.options.length > 0) {
+                selectBox.remove(0);
+            }
+        }
+        function setrooms(gender, full, type) {
+            var farray = full.split(',');
+            var low, high;
+            removeAll();
+            if(gender == 'M') {
+                if(type == '4-person sharing') {
+                    low = 21; high = 31;
+                } else {
+                    low = 31; high = 41;
+                }
+                for(var i = low; i < high; i++) {
+                    if(farray.includes(i.toString())) { continue; }
+                    let opt = new Option('Room ' + i, i);
+                    document.getElementById('roomids').add(opt, undefined);
+                }
+            } else {
+                if(type == '4-person sharing') {
+                    low = 11; high = 21;
+                } else {
+                    low = 1; high = 11;
+                }
+                for(var i = low; i < high; i++) {
+                    if(farray.includes(i.toString())) { continue; }
+                    let opt = new Option('Room ' + i, i);
+                    document.getElementById('roomids').add(opt, undefined);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
